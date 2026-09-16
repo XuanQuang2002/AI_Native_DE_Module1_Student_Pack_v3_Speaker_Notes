@@ -69,10 +69,50 @@ ALTER TABLE "payments" ADD FOREIGN KEY ("status_id") REFERENCES "order_status" (
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("status") REFERENCES "order_status" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
-ALTER TABLE "customer" ADD CONSTRAINT "email_unique" UNIQUE ("email");
+-- Session 01 Bonus
 
-ALTER TABLE "orders" ADD CONSTRAINT "order_date_check" CHECK ("order_date" <= NOW());
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'order_date_check'
+      AND conrelid = 'orders'::regclass
+  ) THEN
+    ALTER TABLE "orders"
+      ADD CONSTRAINT "order_date_check" CHECK ("order_date" <= CURRENT_DATE);
+  END IF;
 
-ALTER TABLE "payments" ADD CONSTRAINT "amount_check" CHECK ("amount" >= 0);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'amount_check'
+      AND conrelid = 'payments'::regclass
+  ) THEN
+    ALTER TABLE "payments"
+      ADD CONSTRAINT "amount_check" CHECK ("amount" >= 0);
+  END IF;
 
-ALTER TABLE "order_item" ADD CONSTRAINT "quantity_check" CHECK ("quantity" >= 0);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'quantity_check'
+      AND conrelid = 'order_item'::regclass
+  ) THEN
+    ALTER TABLE "order_item"
+      ADD CONSTRAINT "quantity_check" CHECK ("quantity" >= 0);
+  END IF;
+END $$;
+
+ALTER TABLE orders ALTER COLUMN order_date SET DEFAULT CURRENT_DATE;
+
+ALTER TABLE orders ALTER COLUMN update_at SET DEFAULT CURRENT_DATE;
+
+ALTER TABLE order_item ALTER COLUMN update_at SET DEFAULT CURRENT_DATE;
+
+ALTER TABLE payments ALTER COLUMN update_at SET DEFAULT CURRENT_DATE;
+
+ALTER TABLE product ALTER COLUMN update_at SET DEFAULT CURRENT_DATE;
+
+ALTER TABLE category ALTER COLUMN update_at SET DEFAULT CURRENT_DATE;
+
+ALTER TABLE customer ALTER COLUMN update_at SET DEFAULT CURRENT_DATE;
+
+ALTER TABLE customer ALTER COLUMN registered_at SET DEFAULT CURRENT_DATE;
