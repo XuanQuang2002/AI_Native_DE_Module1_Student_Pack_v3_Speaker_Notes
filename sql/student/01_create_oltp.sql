@@ -68,3 +68,11 @@ ALTER TABLE "payments" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id") D
 ALTER TABLE "payments" ADD FOREIGN KEY ("status_id") REFERENCES "order_status" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("status") REFERENCES "order_status" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+
+ALTER TABLE "customer" ADD CONSTRAINT "email_unique" UNIQUE ("email");
+
+ALTER TABLE "orders" ADD CONSTRAINT "order_date_check" CHECK ("order_date" <= NOW());
+
+ALTER TABLE "payments" ADD CONSTRAINT "amount_check" CHECK ("amount" >= 0);
+
+ALTER TABLE "order_item" ADD CONSTRAINT "quantity_check" CHECK ("quantity" >= 0);
