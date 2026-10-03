@@ -204,3 +204,113 @@ WITH customer_running_total AS (
 )
 SELECT * 
 FROM customer_running_total;
+
+
+-- 1.3
+select 
+	o.customer_id,
+	extract(day from (now() - max(o.order_date))) as recency_days,
+	count(o.order_id) as frequecy,
+	sum(o.order_total) as monetary
+from orders o
+group by o.customer_id
+order by monetary desc;
+
+-- 1.4 cohort analysis
+with cohort_setup as (
+    select o.customer_id,
+        date_trunc('month', MIN(o.order_date)) as cohort_month
+    from orders o
+    where o.status = 'completed'
+    group by o.customer_id
+),
+cohort_activity as (
+    select 
+        c.cohort_month,
+        o.customer_id,
+        (EXTRACT(YEAR FROM o.order_date) * 12 + EXTRACT(MONTH FROM o.order_date))
+      - (EXTRACT(YEAR FROM c.cohort_month) * 12 + EXTRACT(MONTH FROM c.cohort_month)) AS month_no
+    from orders o
+    join cohort_setup c on o.customer_id = c.customer_id
+    where o.status = 'completed'
+),
+cohort_counts as (
+    select 
+        cohort_month,
+        month_no,
+        count(distinct customer_id) as active_customers
+    from cohort_activity
+    group by cohort_month, month_no
+),
+cohort_sizes as (
+    select cohort_month, active_customers as initial_size
+    from cohort_counts where month_no = 0
+)
+select 
+    cc.cohort_month,
+    max(cs.initial_size) as M0_customers,
+    -- Tính % retention cho từng tháng tiếp theo (Ví dụ đến M3)
+    ROUND(MAX(CASE WHEN cc.month_no = 0 THEN cc.active_customers END) * 100.0 / max(cs.initial_size), 2) AS m0_pct,
+    ROUND(MAX(CASE WHEN cc.month_no = 1 THEN cc.active_customers END) * 100.0 / max(cs.initial_size), 2) AS m1_pct,
+    ROUND(MAX(CASE WHEN cc.month_no = 2 THEN cc.active_customers END) * 100.0 / max(cs.initial_size), 2) AS m2_pct,
+    ROUND(MAX(CASE WHEN cc.month_no = 3 THEN cc.active_customers END) * 100.0 / max(cs.initial_size), 2) AS m3_pct
+from cohort_counts cc
+join cohort_sizes cs on cc.cohort_month = cs.cohort_month
+group by cc.cohort_month
+order by cc.cohort_month;
+
+-- 2.1 RFM 
+with rfm as (
+	select
+		o.customer_id,
+		extract(day from (now()  - max(o.order_date))) as recency,
+		count(*) as frequency,
+		sum(o.order_total) as monetary
+	from orders o
+	group by o.customer_id
+),
+rfm_scores as (
+	select
+		customer_id,
+		recency, frequency, monetary,
+	CASE WHEN recency <= 30 THEN 5
+         WHEN recency <= 90 THEN 4
+         WHEN recency <= 180 THEN 3
+         WHEN recency <= 365 THEN 2
+         ELSE 1 END AS r_score,
+    CASE WHEN frequency >= 10 THEN 5
+         WHEN frequency >= 5 THEN 4
+         WHEN frequency >= 3 THEN 3
+         WHEN frequency >= 2 THEN 2
+         ELSE 1 END AS f_score,
+    CASE WHEN monetary >= 5000 THEN 5
+         WHEN monetary >= 2500 THEN 4
+         WHEN monetary >= 1000 THEN 3
+         WHEN monetary >= 500 THEN 2
+         ELSE 1 END AS m_score
+	from rfm
+)
+select 
+	customer_id,
+	concat(r_score, f_score, m_score) as rfm_segment,
+	monetary as ltv_simple,
+	(monetary / NULLIF(frequency, 0)) * frequency AS ltv_aov_x_freq 
+from rfm_scores 
+order by monetary desc
+limit 20;
+
+-- bonus timesies MOM + moving average
+WITH daily AS (
+  SELECT order_date::DATE AS d, SUM(order_total) AS revenue
+  FROM core.orders
+  GROUP BY 1
+)
+SELECT
+  d,
+  revenue,
+  ROUND((revenue - LAG(revenue) OVER (ORDER BY d))
+    / NULLIF(LAG(revenue) OVER (ORDER BY d), 0) * 100, 1) AS mom_growth_pct,
+  ROUND(AVG(revenue) OVER (ORDER BY d ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2) AS ma_7d,
+  ROUND(AVG(revenue) OVER (ORDER BY d ROWS BETWEEN 29 PRECEDING AND CURRENT ROW), 2) AS ma_30d
+FROM daily
+ORDER BY d;

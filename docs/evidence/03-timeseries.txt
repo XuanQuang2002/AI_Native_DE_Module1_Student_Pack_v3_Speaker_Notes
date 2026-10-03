@@ -1,0 +1,3 @@
+Tháng có `mom_growth_pct` dương lớn nhất thường trùng với đợt khuyến mãi/mùa cao điểm (ví dụ Tết, Black Friday) 
+— cần đối chiếu với lịch marketing để xác nhận nguyên nhân. Tháng giảm mạnh nhất thường là tháng ngay sau đỉnh 
+(hiệu ứng "hụt hơi" sau campaign) hoặc trùng giai đoạn ít ngày lễ/ít đơn hàng theo mùa vụ.
