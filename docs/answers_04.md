@@ -1,0 +1,61 @@
+-- KPI 1
+March 11614566000.00
+January 10536701500.00
+April 9981032000.00
+May 10247839000.00
+February 9541207000.00
+June 9785086500.00
+
+-- KPI 2
+Sportswear 3520997500.00
+Home Decor 4147524000.00
+Personal Care 4728962000.00
+Phones 4974572500.00
+Lifestyle 3029847500.00
+Makeup 3881261000.00
+Kitchen 5291546000.00
+Technology 3962731500.00
+Computers 3651638000.00
+Fitness 4620889000.00
+Skincare 6108296500.00
+Outdoor 3719385500.00
+Furniture 3458898500.00
+Business 3054722000.00
+Accessories 3555160500.00
+
+-- KPI 3
+Product 297 Cell 380010000.00
+Product 309 Ability 353190000.00
+Product 203 Environment 349716000.00
+Product 300 Term 343332000.00
+Product 173 Trade 313215000.00
+Product 268 Stuff 308040500.00
+Product 355 Bag 300132000.00
+Product 084 Job 299148000.00
+Product 126 One 296452500.00
+Product 016 Manage 292917000.00
+Product 116 Care 291582000.00
+Product 204 Realize 284425000.00
+Product 062 Make 283324500.00
+Product 238 Character 283073000.00
+Product 375 Commercial 282240000.00
+Product 295 Animal 282025000.00
+Product 196 Just 278578500.00
+Product 072 Thank 278475000.00
+Product 428 Week 276012000.00
+Product 485 Top 275625000.00
+
+-- KPI 4
+12341286.400000000000
+
+-- KPI 5
+Silver 2916
+Gold 1906
+Platinum 552
+Standard 7343
+
+completed 9933
+pending 359
+confirmed 663
+shipped 1154
+cancelled 608

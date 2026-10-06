@@ -1,0 +1,6 @@
+relation "dim_date" already exists, skipping
+relation "dim_customer" already exists, skipping
+relation "dim_product" already exists, skipping
+relation "dim_payment_method" already exists, skipping
+relation "dim_order_status" already exists, skipping
+relation "fact_sales" already exists, skipping

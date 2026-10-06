@@ -1,0 +1,6 @@
+dim_date = 180
+dim_customer = 1000
+dim_product = 500
+mart_revenue = 61706432000.00
+oltp_revenue = 61706432000.00
+diff = 0
